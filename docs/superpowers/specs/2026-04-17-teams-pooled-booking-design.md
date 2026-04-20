@@ -112,8 +112,8 @@ Organization (1) -> (N) Team (N) <- (1) Team_Member (N) <- (1) User
 | Method | Endpoint | Permissions | Description |
 |--------|----------|-------------|-------------|
 | GET | `/team/{id}/booking` | Member | List team bookings |
-| POST | `/team/{id}/booking` | Leader | Create team booking |
-| DELETE | `/team/{id}/booking/{id}` | Leader | Cancel team booking |
+| POST | `/team/{id}/booking` | Member | Create team booking |
+| DELETE | `/team/{id}/booking/{id}` | Member | Cancel team booking |
 
 ### Team Pool Status
 
@@ -215,7 +215,7 @@ In the main booking flow, add a toggle for leaders:
 ```
 
 When enabled:
-- Team selector appears (only teams where user is leader)
+- Team selector appears
 - Booking is created as team-owned
 - Validation uses pool capacity instead of personal limit
 
@@ -332,13 +332,17 @@ Default: `false` (disabled by default, enabled per-organization)
 
 2. **Contribution changes mid-day:** Changes to contribution limits take effect the next day. Current day's pool is locked.
 
-3. **Team deletion:** All team bookings must be cancelled or transferred before deletion.
+3. **Team deletion:** All team bookings must be cancelled or transferred before deletion. If bookings still exists, deletion will fail in back-end and report error to front-end.
 
 4. **Space restrictions:** Team bookings still respect space-level allowed bookers (groups feature).
 
 5. **Timezone handling:** Pool usage is calculated per calendar day in the organization's timezone.
 
 6. **Recurring bookings:** Team bookings do not support recurring patterns (out of scope for v1).
+
+7. **Team Leader leaving:** If the last team leader wants to leave a team, it fails. They have to promote another member to leader before leaving.
+
+8. **Single Team:** A user can only be part of a single team.
 
 ---
 
@@ -367,12 +371,14 @@ Default: `false` (disabled by default, enabled per-organization)
 
 ---
 
-## Open Questions
+## Open Questions and Decisions
 
 1. Should teams have a description field? -> out of scope
 2. Should there be a team avatar/logo? -> out of scope
 3. Should pool status show per-location breakdown? -> out of scope
 4. Should members be notified when a team booking is made? -> out of scope
+5. Space-level restrictions: Space-level restrictions for teams are calculated as the intersection between all members.
+6. Concurrency: The back-end ensures that Team bookings are synchronized. In case of race-conditions (two people booking the last spot simultaneously) the back-end will throw an error for the second booking.
 
 ---
 

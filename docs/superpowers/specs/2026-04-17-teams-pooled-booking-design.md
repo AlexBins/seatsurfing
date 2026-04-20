@@ -18,21 +18,19 @@ This is intentionally separate from the existing **Groups** feature, which is us
 ### User Stories
 
 1. **As a user**, I want to create a team so that I can coordinate seat booking with my colleagues.
-2. **As a team member**, I want to set how many of my 3 daily seats to contribute to the team pool.
-3. **As a team leader**, I want to book seats using the team's pooled capacity.
+2. **As a team member**, I want to set how many of my daily bookings to contribute to the team pool.
+3. **As a team member**, I want to be able to book seats for the team using the team's booking contingency.
 4. **As a team member**, I want to see team-owned bookings on my calendar so I know which seats are available for me to use.
 5. **As an org admin**, I want to be able to delete any team for governance purposes.
 
 ### Functional Requirements
 
 1. **Team Creation:** Any user can create a team.
-2. **Team Membership:** Users can add/remove themselves from teams. Team leaders can manage membership.
-3. **Contribution Limits:** Each member contributes 0-3 seats to the daily pool.
-4. **Leadership:** Teams have designated leaders who can book from the pool.
-5. **Team Bookings:** Bookings made from the pool are owned by the team, not individuals.
-6. **Calendar Display:** Team bookings appear on all members' calendars with distinct styling.
-7. **Auto Buddy:** Team membership creates automatic buddy relationships.
-8. **Deletion:** Only org admins can delete teams.
+2. **Team Membership:** Users can add/remove themselves from teams. Team creator (leader) can manage memberships.
+3. **Contribution Limits:** Each member contributes as many bookings per day from their daily capacity to the team as they wish. They can define this in the team UI.
+4. **Team Bookings:** Bookings made from the pool are owned by the team, not individuals.
+5. **Calendar Display:** Team bookings appear on all members' calendars with distinct styling.
+6. **Deletion:** Only org admins can delete teams.
 
 ---
 
@@ -235,24 +233,6 @@ const getBookingStyle = (booking: Booking) => {
 };
 ```
 
-### Auto Buddy Integration
-
-When a user joins a team, automatically create buddy relationships with all existing members:
-
-```typescript
-async function joinTeam(teamId: string, userId: string) {
-    await api.post(`/team/${teamId}/member`, { user_id: userId });
-    
-    // Auto-create buddy relationships with existing members
-    const members = await team.getMembers();
-    for (const member of members) {
-        if (member.id !== userId) {
-            await buddyApi.createBuddy(member.id);
-        }
-    }
-}
-```
-
 ---
 
 ## Types
@@ -369,13 +349,11 @@ Default: `false` (disabled by default, enabled per-organization)
 - [ ] Create a team as a regular user
 - [ ] Add members to team
 - [ ] Set contribution limits
-- [ ] Designate leaders
-- [ ] Leader books from team pool
+- [ ] Member books from team pool
 - [ ] Verify pool capacity enforcement
 - [ ] Verify personal limit reduced by contribution
 - [ ] Team bookings appear on member calendars
 - [ ] Team bookings have distinct styling
-- [ ] Auto buddy relationships created
 - [ ] Non-admin cannot delete team
 - [ ] Admin can delete any team
 
@@ -391,10 +369,10 @@ Default: `false` (disabled by default, enabled per-organization)
 
 ## Open Questions
 
-1. Should teams have a description field?
-2. Should there be a team avatar/logo?
-3. Should pool status show per-location breakdown?
-4. Should members be notified when a team booking is made?
+1. Should teams have a description field? -> out of scope
+2. Should there be a team avatar/logo? -> out of scope
+3. Should pool status show per-location breakdown? -> out of scope
+4. Should members be notified when a team booking is made? -> out of scope
 
 ---
 
